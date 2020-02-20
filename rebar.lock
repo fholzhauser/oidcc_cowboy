@@ -1,18 +1,22 @@
 {"1.1.0",
-[{<<"base64url">>,{pkg,<<"base64url">>,<<"0.0.1">>},0},
- {<<"cowboy">>,{pkg,<<"cowboy">>,<<"1.0.4">>},0},
- {<<"cowlib">>,{pkg,<<"cowlib">>,<<"1.0.2">>},1},
- {<<"erljwt">>,{pkg,<<"erljwt">>,<<"2.0.2">>},1},
- {<<"jsone">>,{pkg,<<"jsone">>,<<"1.4.0">>},0},
- {<<"oidcc">>,{pkg,<<"oidcc">>,<<"1.6.0">>},0},
- {<<"ranch">>,{pkg,<<"ranch">>,<<"1.4.0">>},1}]}.
+[{<<"base64url">>,{pkg,<<"base64url">>,<<"1.0.1">>},0},
+ {<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.7.0">>},0},
+ {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.8.0">>},1},
+ {<<"erljwt">>,
+  {git,"git@github.com:fholzhauser/erljwt.git",
+       {ref,"d05cd5f7311dc3919e8d27d035a800ee997c580a"}},
+  1},
+ {<<"jsone">>,{pkg,<<"jsone">>,<<"1.5.2">>},0},
+ {<<"oidcc">>,
+  {git,"git@github.com:fholzhauser/oidcc.git",
+       {ref,"b12fb37ac83a720ee5e97160f327ac7f83bda212"}},
+  0},
+ {<<"ranch">>,{pkg,<<"ranch">>,<<"1.7.1">>},1}]}.
 [
 {pkg_hash,[
- {<<"base64url">>, <<"36A90125F5948E3AFD7BE97662A1504B934DD5DAC78451CA6E9ABF85A10286BE">>},
- {<<"cowboy">>, <<"A324A8DF9F2316C833A470D918AAF73AE894278B8AA6226CE7A9BF699388F878">>},
- {<<"cowlib">>, <<"9D769A1D062C9C3AC753096F868CA121E2730B9A377DE23DEC0F7E08B1DF84EE">>},
- {<<"erljwt">>, <<"3D17F4BFE965F712A58F3D6AD424FD100D028987FDED6834A64E94091F44D3C9">>},
- {<<"jsone">>, <<"6ECFD2C91E16F48E1535743B57D01A42C65D7DD51A8B43E5723B1F79927169A8">>},
- {<<"oidcc">>, <<"253C33EA8E63CBC9736E646C3745DED34C20CD9BCBB12A2F868F7A24B1E8CC12">>},
- {<<"ranch">>, <<"10272F95DA79340FA7E8774BA7930B901713D272905D0012B06CA6D994F8826B">>}]}
+ {<<"base64url">>, <<"F8C7F2DA04CA9A5D0F5F50258F055E1D699F0E8BF4CFDB30B750865368403CF6">>},
+ {<<"cowboy">>, <<"91ED100138A764355F43316B1D23D7FF6BDB0DE4EA618CB5D8677C93A7A2F115">>},
+ {<<"cowlib">>, <<"FD0FF1787DB84AC415B8211573E9A30A3EBE71B5CBFF7F720089972B2319C8A4">>},
+ {<<"jsone">>, <<"87ADEA283C9CF24767B4DEED44602989A5331156DF5D60A2660E9C9114D54046">>},
+ {<<"ranch">>, <<"6B1FAB51B49196860B733A49C07604465A47BDB78AA10C1C16A3D199F7F8C881">>}]}
 ].
