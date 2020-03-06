@@ -1,9 +1,6 @@
 -module(oidcc_cowboy).
--behaviour(cowboy_http_handler).
 
--export([init/3]).
--export([handle/2]).
--export([terminate/3]).
+-export([init/2]).
 
 -record(state, {
           request_type = bad,
@@ -11,7 +8,6 @@
           error = undefined,
           state = undefined,
           provider = undefined,
-
           session = undefined,
           peer_ip = undefined,
           url_extension = #{},
@@ -24,15 +20,17 @@
 
 -define(COOKIE, <<"oidcc_session">>).
 
-init(_, Req, _Opts) ->
+init(Req, _Opts) -> 
+    extract_args(Req),
     try extract_args(Req) of
-        {ok, Req2, State} -> {ok, Req2, State}
+        {ok, Req2, State} -> 
+            handle(Req2, State)
     catch
         _:_ ->
             Desc = <<"internal error occured">>,
-            {ok, Req, #state{request_type=internal_error,
+            handle(Req, #state{request_type=internal_error,
                              error = Desc
-                            }}
+                            })
     end.
 
 handle(Req, #state{request_type = redirect} = State) ->
@@ -197,11 +195,11 @@ apply_updates([], Req) ->
 apply_updates([{raw, Req}], _) ->
     {ok, Req};
 apply_updates([{redirect, Url}|T], Req) ->
-    Header = [{<<"location">>, Url}],
-    {ok, Req2} = cowboy_req:reply(302, Header, Req),
+    Header = #{<<"location">> => Url},
+    Req2 = cowboy_req:reply(302, Header, Req),
     apply_updates(T, Req2);
 apply_updates([{cookie, Name, Data, Options} | T], Req) ->
-    Req2 = cowboy_req:set_resp_cookie(Name, Data, Options, Req),
+    Req2 = cowboy_req:set_resp_cookie(Name, Data, Req, Options),
     apply_updates(T, Req2);
 apply_updates([{none} | T], Req) ->
     apply_updates(T, Req).
@@ -232,45 +230,32 @@ clear_cookie() ->
     {cookie, ?COOKIE, <<"deleted">>, cookie_opts(0)}.
 
 cookie_opts(MaxAge) ->
-    BasicOpts = [ {http_only, true}, {max_age, MaxAge}, {path, <<"/">>}],
+    BasicOpts = #{http_only => true, max_age => MaxAge, path => <<"/">>},
     add_secure(application:get_env(oidcc, secure_cookie, false), BasicOpts).
 
 add_secure(true, BasicOpts) ->
-    [{secure, true} | BasicOpts];
+    BasicOpts#{secure => true};
 add_secure(_, BasicOpts) ->
     BasicOpts.
 
-terminate(_Reason, _Req, _State) ->
-    ok.
-
-extract_args(Req) ->
-    {QsList, Req1} = cowboy_req:qs_vals(Req),
-    {ok, BodyQsList, Req2} = cowboy_req:body_qs(Req1),
-    {Headers, Req3} = cowboy_req:headers(Req2),
-    {Method, Req4} = cowboy_req:method(Req3),
-    {Cookies, Req5} = cowboy_req:cookies(Req4),
-    CookieData =  case lists:keyfind(?COOKIE, 1, Cookies) of
-                      false -> undefined;
-                      {?COOKIE, Data} -> Data
-                  end,
-    {{PeerIP, _Port}, Req99} = cowboy_req:peer(Req5),
-
-    QsUpdate = #{req_method => Method,
-                 req_cookie_data => CookieData
-                },
-    QsMap = maps:merge(create_map_from_proplist(QsList ++ BodyQsList),
-                       QsUpdate),
-
-    UserAgent = get_header(<<"user-agent">>, Headers),
-    Referer = get_header(<<"referer">>, Headers),
+extract_args(#{headers := Headers, method := Method, peer := Peer} = Req) ->
+    QsList = cowboy_req:parse_qs(Req),
+    {ok, BodyQsList, Req1} = cowboy_req:read_urlencoded_body(Req),
+    Cookies = cowboy_req:parse_cookies(Req),
+    CookieData = proplists:get_value(?COOKIE, Cookies),
+    {PeerIP, _Port} = Peer,
+    QsUpdate = #{req_method => Method, req_cookie_data => CookieData},
+    QsMap = maps:merge(create_map_from_proplist(QsList ++ BodyQsList), QsUpdate),
+    UserAgent = maps:get(<<"user-agent">>, Headers, undefined),
+    Referer = maps:get(<<"referer">>, Headers, undefined),
     NewState = #state{
-                  peer_ip = PeerIP,
-                  user_agent = UserAgent,
-                  referer = Referer
-                 },
+        peer_ip = PeerIP,
+        user_agent = UserAgent,
+        referer = Referer
+    },
     ProviderId0  = maps:get(provider, QsMap, undefined),
     ProviderId = validate_provider(ProviderId0),
-    redirect_or_login(ProviderId, QsMap, Req99, NewState).
+    redirect_or_login(ProviderId, QsMap, Req1, NewState).
 
 
 redirect_or_login(undefined, QsMap, Req, State) ->
@@ -380,10 +365,4 @@ map_to_atom(Key, Mapping) ->
             AKey;
         _ ->
             Key
-    end.
-
-get_header(Key, Headers) ->
-    case lists:keyfind(Key, 1, Headers) of
-        {Key, Value} -> Value;
-        false -> undefined
     end.

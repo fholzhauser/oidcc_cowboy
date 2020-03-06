@@ -10,7 +10,7 @@
                                 jsone,
                                 cowboy
                                ]},
-         {maintainers, ["Bas Wegh"]},
+         {maintainers, ["Ferenc Holzhauser"]},
          {licenses, ["Apache 2.0"]},
-         {links, [{"GitHub","https://github.com/indigo-dc/oidcc_cowboy"}]}
+         {links, [{"GitHub","https://github.com/fholzhauser/oidcc_cowboy"}]}
         ]}.

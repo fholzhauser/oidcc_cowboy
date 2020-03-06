@@ -11,4 +11,3 @@ rel/example_project
 _build/
 *~
 *#
-example/basic_client/rebar.lock

@@ -1,5 +1,5 @@
 # oidcc_cowboy
-Cowboy callback module for easy integration of OpenId Connect, using [oidcc](https://github.com/indigo-dc/oidcc).
+Cowboy callback module for easy integration of OpenId Connect, using [oidcc] (https://github.com/indigo-dc/oidcc).
 
 ## Configuration
 | Key | Description | Allowed Values (Default) |
